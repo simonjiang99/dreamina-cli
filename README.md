@@ -1,187 +1,185 @@
 # dreamina-cli
 
-> 即梦（Dreamina）官方 CLI 工具的使用指南、一键安装脚本与 Agent Skill。
+> Guide, one-click install, and Agent Skill for the official Dreamina（即梦）CLI.
 
-即梦是字节跳动推出的 AIGC 平台，支持文生图、文生视频、图生视频、多模态视频等能力。本仓库收录了 CLI 的安装方式、常用命令速查，以及供 AI Agent 调用的 Skill 文件。
+**[中文文档 →](README.zh-CN.md)**
+
+Dreamina is ByteDance's AIGC platform supporting text-to-image, text-to-video, image-to-video, multimodal video, and more. This repo contains installation instructions, a command reference, and a Skill file for AI Agents.
 
 ---
 
-## 一键安装
+## One-click Install
 
 ```bash
 curl -fsSL https://jimeng.jianying.com/cli | bash
 ```
 
-安装完成后，可执行文件为 `dreamina`，默认安装到 `~/.local/bin/`。
+The binary `dreamina` is installed to `~/.local/bin/` by default.
 
 ---
 
-## 登录
+## Login
 
-### 方式一：浏览器扫码（推荐）
+### Option 1: QR Code via Headless Browser (recommended)
 
 ```bash
 dreamina login --headless
 ```
 
-用**抖音 App** 扫描终端/图片中的二维码，并在手机上确认授权。
+Scan the QR code with the **Douyin (TikTok) App** and confirm authorization on your phone.
 
-### 方式二：网页导入 JSON
+### Option 2: Manual JSON Import
 
-1. 浏览器登录即梦：`https://jimeng.jianying.com/ai-tool/login`
-2. 访问以下链接，复制返回的完整 JSON：
+1. Log in to Dreamina in your browser: `https://jimeng.jianying.com/ai-tool/login`
+2. Visit the following URL and copy the full JSON response:
    ```
    https://jimeng.jianying.com/dreamina/cli/v1/dreamina_cli_login
    ```
-3. 保存为文件后导入：
+3. Save it as a file and import:
    ```bash
    dreamina import_login_response --file /path/to/dreamina-login.json
    ```
 
 ---
 
-## 命令速查
+## Command Reference
 
-### 账户
+### Account
 
-| 命令 | 说明 |
-|------|------|
-| `dreamina login` | 登录（浏览器回调） |
-| `dreamina login --headless` | 登录（无头浏览器+二维码，适合 Agent） |
-| `dreamina logout` | 退出登录 |
-| `dreamina relogin` | 强制重新登录 |
-| `dreamina user_credit` | 查看剩余积分 |
+| Command | Description |
+|---------|-------------|
+| `dreamina login` | Login via browser callback |
+| `dreamina login --headless` | Login via headless browser + QR code (Agent-friendly) |
+| `dreamina logout` | Clear local login session |
+| `dreamina relogin` | Force a fresh login |
+| `dreamina user_credit` | Check remaining credit balance |
 
-### 任务管理
+### Task Management
 
-| 命令 | 说明 |
-|------|------|
-| `dreamina list_task` | 列出历史任务 |
-| `dreamina list_task --gen_status=success` | 只看成功的任务 |
-| `dreamina query_result --submit_id=<id>` | 查询单个任务结果 |
+| Command | Description |
+|---------|-------------|
+| `dreamina list_task` | List saved tasks |
+| `dreamina list_task --gen_status=success` | Filter by successful tasks |
+| `dreamina query_result --submit_id=<id>` | Query a single async task |
 
-### 图像生成
+### Image Generation
 
-| 命令 | 说明 |
-|------|------|
-| `dreamina text2image --prompt="..." --ratio=1:1` | 文生图 |
-| `dreamina image2image --images ./input.png --prompt="..."` | 图生图 |
-| `dreamina image_upscale --image ./input.png --resolution_type=4k` | 图像超分 |
+| Command | Description |
+|---------|-------------|
+| `dreamina text2image --prompt="..." --ratio=1:1` | Text to image |
+| `dreamina image2image --images ./input.png --prompt="..."` | Image to image |
+| `dreamina image_upscale --image ./input.png --resolution_type=4k` | Upscale image |
 
-### 视频生成
+### Video Generation
 
-| 命令 | 说明 |
-|------|------|
-| `dreamina text2video --prompt="..." --duration=5` | 文生视频 |
-| `dreamina image2video --image ./first.png --prompt="..."` | 单图生视频 |
-| `dreamina frames2video --first ./a.png --last ./b.png --prompt="..."` | 首尾帧生视频 |
-| `dreamina multiframe2video --images ./a.png,./b.png --prompt="..."` | 多图故事视频 |
-| `dreamina multimodal2video --image ./input.png --audio ./music.mp3` | 多模态旗舰视频 |
+| Command | Description |
+|---------|-------------|
+| `dreamina text2video --prompt="..." --duration=5` | Text to video |
+| `dreamina image2video --image ./first.png --prompt="..."` | Single image to video |
+| `dreamina frames2video --first ./a.png --last ./b.png --prompt="..."` | First-last frames to video |
+| `dreamina multiframe2video --images ./a.png,./b.png --prompt="..."` | Multi-image story video |
+| `dreamina multimodal2video --image ./input.png --audio ./music.mp3` | Flagship multimodal video |
 
 ---
 
-## 常用示例
+## Examples
 
 ```bash
-# 文生图（默认模型，1:1 比例，2K）
-dreamina text2image --prompt="赛博朋克城市夜景，霓虹灯倒影" --ratio=1:1 --resolution_type=2k
+# Text to image (default model, 1:1, 2K)
+dreamina text2image --prompt="cyberpunk cityscape at night, neon reflections" --ratio=1:1 --resolution_type=2k
 
-# 文生视频（5秒，16:9）
-dreamina text2video --prompt="一只猫在草地上奔跑" --duration=5 --ratio=16:9
+# Text to video (5s, 16:9)
+dreamina text2video --prompt="a cat running through a meadow" --duration=5 --ratio=16:9
 
-# 图生视频，提交后轮询30秒
-dreamina image2video --image ./photo.png --prompt="镜头缓慢推进" --poll=30
+# Image to video with 30s polling
+dreamina image2video --image ./photo.png --prompt="slow camera push in" --poll=30
 
-# 查询异步任务结果并下载
+# Query async result and download
 dreamina query_result --submit_id=3f6eb41f425d23a3 --download_dir=./output
 
-# 查看剩余积分
+# Check credit balance
 dreamina user_credit
 ```
 
 ---
 
-## 模型参考
+## Model Reference
 
-### 文生图 / 图生图
+### Text-to-Image / Image-to-Image
 
-| model_version | resolution_type | 备注 |
-|---------------|-----------------|------|
+| model_version | resolution_type | Notes |
+|---------------|-----------------|-------|
 | 3.0 / 3.1 | 1k, 2k | - |
 | 4.0 / 4.1 / 4.5 / 4.6 / 5.0 | 2k, 4k | - |
-| lab | 2k, 4k | 需要 VIP |
+| lab | 2k, 4k | VIP required |
 
-### 视频生成
+### Video Generation
 
-| model_version | 时长 | 分辨率 | 命令 |
-|---------------|------|--------|------|
+| model_version | Duration | Resolution | Commands |
+|---------------|----------|------------|----------|
 | seedance2.0 | 4-15s | 720p | text2video / image2video / frames2video / multimodal2video |
-| seedance2.0fast | 4-15s | 720p | 同上，速度更快 |
+| seedance2.0fast | 4-15s | 720p | Same as above, faster |
 | 3.5pro | 4-12s | 720p/1080p | image2video / frames2video |
 
-> 使用前建议先 `dreamina <subcommand> -h` 确认当前支持的参数组合。
+> Always run `dreamina <subcommand> -h` to confirm the exact supported flags before use.
 
 ---
 
-## 给 Agent 的说明（Auto-Install Instructions）
+## For AI Agents (Auto-Install Instructions)
 
-如果你是 AI Agent，请按以下步骤操作：
+If you are an AI Agent, follow these steps:
 
-### 第一步：安装 CLI
+### Step 1: Install the CLI
 
 ```bash
 curl -fsSL https://jimeng.jianying.com/cli | bash
 ```
 
-### 第二步：安装 Skill
+### Step 2: Install the Skill
 
-安装完成后，Skill 文件已自动下载到：
+After installation, the Skill file is automatically saved to:
 
 ```
 ~/.dreamina_cli/dreamina/SKILL.md
 ```
 
-将其复制到你的 Agent skills 目录（以 Claude Code 为例）：
+Copy it to your Agent's skills directory (example for Claude Code):
 
 ```bash
-# 查找 Claude Code 的 skills 目录
-ls ~/.claude/
-
-# 复制 skill
 cp ~/.dreamina_cli/dreamina/SKILL.md ~/.claude/skills/dreamina-cli.md
 ```
 
-也可以直接从本仓库获取 Skill 文件：
+Or fetch it directly from this repo:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/simonjiang99/dreamina-cli/main/skill/SKILL.md \
   -o ~/.claude/skills/dreamina-cli.md
 ```
 
-### 第三步：登录（Agent 代操作）
+### Step 3: Login (Agent-driven)
 
-在 headless 环境中，优先使用 `--headless` 模式，生成二维码让用户扫描：
+In headless or remote environments, use `--headless` to generate a QR code for the user to scan:
 
 ```bash
 dreamina login --headless
 ```
 
-或者让用户手动完成网页登录后，将 JSON 文件路径告知 Agent：
+Or, after the user completes web login and provides the JSON file:
 
 ```bash
 dreamina import_login_response --file /path/to/dreamina-login.json
 ```
 
-### 注意事项
+### Important Notes
 
-- 所有生成操作均**消耗积分**，执行前务必告知用户
-- 部分任务为异步，提交后需用 `query_result` 查询结果
-- 部分模型首次使用前需在即梦 Web 端完成授权确认
-- 详细参数以 `dreamina <subcommand> -h` 的输出为准，不要依赖本文档的静态描述
+- All generation commands **consume credits** — warn the user before running them
+- Many generation tasks are async; use `query_result` after submitting
+- Some models require a one-time web-side authorization on Dreamina before first use
+- Always treat `dreamina <subcommand> -h` as the authoritative reference, not this document
 
 ---
 
-## 相关链接
+## Links
 
-- 即梦官网：[jimeng.jianying.com](https://jimeng.jianying.com)
-- CLI 安装脚本：`curl -fsSL https://jimeng.jianying.com/cli | bash`
+- Dreamina website: [jimeng.jianying.com](https://jimeng.jianying.com)
+- Install: `curl -fsSL https://jimeng.jianying.com/cli | bash`
