@@ -154,7 +154,7 @@ cp ~/.dreamina_cli/dreamina/SKILL.md ~/.claude/skills/dreamina-cli.md
 也可以直接从本仓库获取 Skill 文件：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/simonjiang99/dreamina-cli/main/SKILL.md \
+curl -fsSL https://raw.githubusercontent.com/simonjiang99/dreamina-cli/main/skill/SKILL.md \
   -o ~/.claude/skills/dreamina-cli.md
 ```
 
